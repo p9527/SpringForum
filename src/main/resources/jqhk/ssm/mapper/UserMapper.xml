@@ -1,0 +1,78 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 和 java mapper 的类名一样，从包名开始打，有自动补全-->
+<mapper namespace="jqhk.ssm.mapper.UserMapper">
+    <!-- resultType 和 mapper 中的方法返回值一样，不能省，从包名开始打，有自动补全-->
+    <!--  里面的 sql 语句，有自动补全,要配置 ide 的 datasource -->
+    <select id="selectAllUser" resultType="jqhk.ssm.model.UserModel">
+        SELECT * FROM ssmCnode.User
+    </select>
+
+    <select id="sourceOrderList" resultType="jqhk.ssm.model.UserModel">
+        SELECT * FROM ssmCnode.User
+        ORDER BY source DESC
+        LIMIT #{count}
+    </select>
+
+    <!-- 传参数方式1，直接传入一个基本类型 int，这个 int 会被绑定到 ${id} -->
+    <select id="selectUser" resultType="jqhk.ssm.model.UserModel">
+        SELECT * FROM ssmCnode.User WHERE id = ${id}
+    </select>
+
+    <select id="selectOnerByUsername" resultType="jqhk.ssm.model.UserModel">
+        SELECT * FROM ssmCnode.User WHERE username = #{username}
+    </select>
+
+    <select id="selectSourceTop100" resultType="jqhk.ssm.model.UserModel">
+        SELECT
+        u.username,
+        u.source,
+       (
+           SELECT COUNT(t.id)
+           FROM ssmCnode.Topic as t
+           WHERE t.userId = u.id
+       ) as topicCount,
+       (
+           SELECT COUNT(c.id)
+           FROM ssmCnode.`Comment` as c
+           WHERE c.userId = u.id
+       ) as replyCount
+        FROM ssmCnode.`User` as u
+        ORDER BY u.source DESC
+        LIMIT 100
+    </select>
+
+    <!-- 传参方式2，传入一个对象。content 代表这个对象的 content 属性，注意这个对象要有 getter setter -->
+    <!-- useGeneratedKeys keyProperty 当我传入一个对象的时候，这两个属性可以把数据库创建的 id 赋值给这个对象 -->
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ssmCnode.User (username, password, role, createdTime, avatar)
+        VALUES (#{userName}, #{password}, #{role}, #{createdTime}, #{avatar});
+    </insert>
+    
+    <update id="updateUser">
+        UPDATE ssmCnode.User
+        SET password=#{password}
+        WHERE username = #{userName}
+    </update>
+
+    <update id="updateSetting">
+        UPDATE ssmCnode.User
+        SET note = #{note}
+        WHERE id = #{id}
+    </update>
+
+    <update id="changeAvatar">
+        UPDATE ssmCnode.User
+        SET avatar = #{avatar}
+        WHERE id = #{userId}
+    </update>
+
+    <update id="sourceAdd">
+        UPDATE ssmCnode.User SET source = source + #{numOfSource} WHERE username = #{userName}
+    </update>
+
+    <delete id="deleteUser">
+        DELETE FROM ssmCnode.User WHERE id = #{id}
+    </delete>
+</mapper>

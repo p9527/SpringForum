@@ -1,0 +1,38 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 和 java mapper 的类名一样，从包名开始打，有自动补全-->
+<mapper namespace="jqhk.ssm.mapper.CommentMapper">
+    <!-- resultType 和 mapper 中的方法返回值一样，不能省，从包名开始打，有自动补全-->
+    <!--  里面的 sql 语句，有自动补全,要配置 ide 的 datasource -->
+    <select id="selectAllComment" resultType="jqhk.ssm.model.CommentModel">
+        SELECT Comment.*, User.username as userName
+        FROM ssmCnode.Comment join ssmCnode.User
+        ON Comment.userId = User.id
+        where Comment.topicId = #{topicId}
+    </select>
+
+    <!-- 传参数方式1，直接传入一个基本类型 int，这个 int 会被绑定到 ${id} -->
+    <select id="selectComment" resultType="jqhk.ssm.model.CommentModel">
+        SELECT c.*, u.username as userName
+        FROM ssmCnode.Comment as c
+        LEFT JOIN ssmCnode.User as u
+        ON c.userId = u.id
+        WHERE c.id = ${id}
+    </select>
+
+    <!-- 传参方式2，传入一个对象。content 代表这个对象的 content 属性，注意这个对象要有 getter setter -->
+    <!-- useGeneratedKeys keyProperty 当我传入一个对象的时候，这两个属性可以把数据库创建的 id 赋值给这个对象 -->
+    <insert id="insertComment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ssmCnode.Comment (content, topicId, userId, createdTime, updatedTime, floor)
+        VALUES (#{content}, #{topicId}, #{userId}, #{createdTime}, #{updatedTime}, #{floor})
+    </insert>
+
+    <update id="updateComment">
+        UPDATE ssmCnode.Comment SET content = #{content} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteComment">
+        DELETE FROM ssmCnode.Comment WHERE id = #{id}
+    </delete>
+</mapper>

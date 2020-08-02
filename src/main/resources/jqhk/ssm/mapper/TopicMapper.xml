@@ -1,0 +1,52 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 和 java mapper 的类名一样，从包名开始打，有自动补全-->
+
+
+<mapper namespace="jqhk.ssm.mapper.TopicMapper">
+    <!-- resultType 和 mapper 中的方法返回值一样，不能省，从包名开始打，有自动补全-->
+    <!--  里面的 sql 语句，有自动补全,要配置 ide 的 datasource -->
+
+    <!-- 传参方式2，传入一个对象。content 代表这个对象的 content 属性，注意这个对象要有 getter setter -->
+    <!-- useGeneratedKeys keyProperty 当我传入一个对象的时候，这两个属性可以把数据库创建的 id 赋值给这个对象 -->
+    <insert id="insertTopic" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ssmCnode.Topic (title, content, createdTime, updatedTime, userId, tab)
+        VALUES (#{title}, #{content}, #{createdTime}, #{updatedTime}, #{userId}, #{tab})
+    </insert>
+
+    <insert id="collection">
+        INSERT INTO ssmCnode.TopicCollection (userId, topicId, createdTime)
+        VALUES (#{userId}, #{topicId}, #{time})
+    </insert>
+
+    <delete id="cancelCollection">
+        DELETE FROM ssmCnode.TopicCollection WHERE userId = #{userId} and topicId = #{topicId}
+    </delete>
+    
+    <update id="updateTopic">
+        UPDATE ssmCnode.Topic
+        SET content = #{content}, title=#{title}, tab=#{tab}, updatedTime=#{updatedTime}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateReplyCount">
+        UPDATE ssmCnode.Topic SET replyCount = replyCount + 1 WHERE id = #{topicId}
+    </update>
+
+    <update id="updateViewCount">
+        UPDATE ssmCnode.Topic SET viewCount = viewCount + 1 WHERE id = #{topicId}
+    </update>
+
+    <update id="setGood">
+        UPDATE ssmCnode.Topic SET good = #{good} WHERE id = #{id}
+    </update>
+
+    <update id="setTop">
+        UPDATE ssmCnode.Topic SET top = #{top} WHERE id = #{id}
+    </update>
+
+    <delete id="deleteTopic">
+        DELETE FROM ssmCnode.Topic WHERE id = #{id}
+    </delete>
+</mapper>

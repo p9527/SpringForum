@@ -1,0 +1,26 @@
+<!doctype html>
+
+<title>CodeMirror: Markdown mode</title>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+
+<script src="/codemirror/lib/codemirror.js"></script>
+<script src="/codemirror/addon/edit/continuelist.js"></script>
+<script src="/codemirror/model/markdown/markdown.js"></script>
+<style>
+    .CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}
+    .cm-s-default .cm-trailing-space-a:before,
+    .cm-s-default .cm-trailing-space-b:before {position: absolute; content: "\00B7"; color: #777;}
+    .cm-s-default .cm-trailing-space-new-line:before {position: absolute; content: "\21B5"; color: #777;}
+</style>
+<form id='reply_form' action='http://localhost:9000/comment/add' method='post'>
+    <div class='markdown_editor in_editor'>
+        <div class='markdown_in_editor'>
+            <input name="topicId" value="1" hidden>
+            <textarea id="code" name="content" value="test" hidden></textarea>
+            <div class='editor_buttons'>
+                <input class='span-primary submit_btn' type="submit" data-loading-text="回复中.." value="回复" >
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,170 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 和 java mapper 的类名一样，从包名开始打，有自动补全-->
+
+
+<mapper namespace="jqhk.ssm.mapper.TopicSelectMapper">
+    <sql id="test">
+        
+    </sql>
+    <!-- resultType 和 mapper 中的方法返回值一样，不能省，从包名开始打，有自动补全-->
+    <!--  里面的 sql 语句，有自动补全,要配置 ide 的 datasource -->
+    <select id="selectAllTopic" resultType="jqhk.ssm.model.TopicModel">
+        SELECT * FROM ssmCnode.Topic
+        ORDER BY createdTime DESC
+    </select>
+
+    <select id="selectAllNotTopTopic" resultType="jqhk.ssm.model.TopicModel">
+        SELECT *, User.username as userName, User.avatar as userAvatar
+        FROM ssmCnode.Topic
+        JOIN ssmCnode.User
+        ON Topic.userId = User.id
+        WHERE top = FALSE
+        ORDER BY Topic.createdTime DESC
+        LIMIT #{first}, #{count}
+    </select>
+
+    <select id="selectCollectionTopic" resultType="jqhk.ssm.model.TopicModel">
+        SELECT *, u.username as userName
+        FROM ssmCnode.Topic as t
+                 JOIN ssmCnode.User as u
+                      ON t.userId = u.id
+                 JOIN ssmCnode.TopicCollection as tc
+                      ON t.id = tc.topicId
+        WHERE tc.userId = #{userId}
+        ORDER BY tc.createdTime DESC
+    </select>
+
+    <select id="collected" resultType="java.lang.Integer">
+        SELECT tc.topicId
+        FROM TopicCollection as tc
+        where tc.userId = #{userId} and tc.topicId = #{topicId}
+    </select>
+
+    <resultMap id="topicWithComment" type="jqhk.ssm.model.TopicModel">
+        <id property="id" column="t_id" />
+        <result property="title" column="t_title" />
+        <result property="content" column="t_content" />
+        <result property="createdTime" column="t_createdTime" />
+        <result property="viewCount" column="t_viewCount" />
+        <result property="replyCount" column="t_replyCount" />
+        <result property="tab" column="t_tab" />
+        <result property="userId" column="t_userId" />
+        <result property="userName" column="t_userName" />
+        <result property="userAvatar" column="t_userAvatar" />
+        <collection property="comments" ofType="jqhk.ssm.model.CommentModel">
+            <id property="id" column="c_id" />
+            <result property="content" column="c_content" />
+            <result property="createdTime" column="c_createdTime" />
+            <result property="floor" column="c_floor" />
+            <result property="userName" column="c_userName" />
+            <result property="userAvatar" column="c_userAvatar" />
+        </collection>
+    </resultMap>
+
+    <!-- 传参数方式1，直接传入一个基本类型 int，这个 int 会被绑定到 ${id} -->
+    <select id="selectOneWithComment" resultMap="topicWithComment">
+        select
+        t.id as t_id,
+        t.title as t_title,
+        t.content as t_content,
+        t.createdTime as t_createdTime,
+        t.viewCount as t_viewCount,
+        t.replyCount as t_replyCount,
+        t.tab as t_tab,
+        t.userId as t_userId,
+        t_u.username as t_userName,
+        t_u.avatar as t_userAvatar,
+        c.id as c_id,
+        c.content as c_content,
+        c.floor as c_floor,
+        c.createdTime as c_createdTime,
+        c_u.username as c_userName,
+        c_u.avatar as c_userAvatar
+        from Topic as t
+        LEFT JOIN User as t_u
+        on t.userId = t_u.id
+        LEFT JOIN Comment as c
+        on c.topicId = t.id
+        LEFT JOIN User as c_u
+        on c.userId = c_u.id
+        WHERE t.id = ${id}
+    </select>
+
+    <select id="selectOne" resultType="jqhk.ssm.model.TopicModel">
+        SELECT *
+        FROM ssmCnode.Topic
+        WHERE Topic.id = ${id}
+    </select>
+
+    <select id="selectTopicInCommentByUserId" resultType="jqhk.ssm.model.TopicModel">
+        SELECT *
+        FROM ssmCnode.Topic
+        WHERE id IN (
+            SELECT DISTINCT `topicId`
+            FROM ssmCnode.Comment
+            where userId = #{userId}
+        )
+        ORDER BY Topic.createdTime DESC
+        LIMIT #{count}
+    </select>
+
+    <select id="selectTopicByTab" resultType="jqhk.ssm.model.TopicModel">
+        SELECT * FROM ssmCnode.Topic
+        WHERE tab = #{tab}
+        ORDER BY createdTime DESC
+    </select>
+
+    <select id="selectNotTopTopicByTab" resultType="jqhk.ssm.model.TopicModel">
+        SELECT *, User.username as userName, User.avatar as userAvatar
+        FROM ssmCnode.Topic
+                 JOIN ssmCnode.User
+                      ON Topic.userId = User.id
+        WHERE tab = #{tab} and top = false
+        ORDER BY Topic.createdTime DESC
+        LIMIT #{first}, #{count}
+    </select>
+
+    <select id="selectTopTopicByTab" resultType="jqhk.ssm.model.TopicModel">
+        SELECT *, User.username as userName, User.avatar as userAvatar
+        FROM ssmCnode.Topic
+                 JOIN ssmCnode.User
+                      ON Topic.userId = User.id
+        WHERE tab = #{tab} and top = true
+        ORDER BY Topic.createdTime DESC
+    </select>
+
+    <select id="selectGoodTopic" resultType="jqhk.ssm.model.TopicModel">
+        SELECT *, User.username as userName, User.avatar as userAvatar
+        FROM ssmCnode.Topic
+                 JOIN ssmCnode.User
+                      ON Topic.userId = User.id
+        WHERE good = TRUE
+        ORDER BY Topic.createdTime DESC
+        LIMIT #{first}, #{count}
+    </select>
+
+    <select id="selectTopTopic" resultType="jqhk.ssm.model.TopicModel">
+        SELECT *, User.username as userName, User.avatar as userAvatar
+        FROM ssmCnode.Topic
+                 JOIN ssmCnode.User
+                      ON Topic.userId = User.id
+        WHERE top = TRUE
+        ORDER BY Topic.createdTime DESC
+    </select>
+
+    <select id="selectNoReplyTopic" resultType="jqhk.ssm.model.TopicModel">
+        SELECT * FROM ssmCnode.Topic
+        WHERE replyCount = 0
+        ORDER BY createdTime DESC
+        LIMIT 5
+    </select>
+
+    <select id="selectAllTopicByUserId" resultType="jqhk.ssm.model.TopicModel">
+        SELECT * FROM ssmCnode.Topic
+        WHERE userId = #{userId}
+        ORDER BY createdTime DESC
+        LIMIT #{count}
+    </select>
+</mapper>
